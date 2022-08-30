@@ -16,7 +16,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     val CITY: String = "Salina,US"
-    val API:  String = "" //Open Weather map API
+    val API:  String = "12345" //Open Weather map API
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +27,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     inner class weatherTask() : AsyncTask<String, Void, String>(){
+
+        //This is the function provided by the Android API
+        //Invoked on the Ui thread before the task is executed
+        //Used to setup the task, we show the loader and set the main content to gone and erorr to gone.
         override fun onPreExecute(){
             super.onPreExecute()
             findViewById<ProgressBar>(R.id.loader).visibility = View.VISIBLE
@@ -34,9 +38,14 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.errortext).visibility = View.GONE
         }
 
+        //This is the function provided by the Android API
+        //Invoked on the background thread right after the onPreExecute() finishes executing
+        //Used to perform background computations that can take a long time
     override fun doInBackground(vararg params: String?): String? {
+            //Set the response to a string that can be null
         var response:String?
         try{
+            //Exposes javascript url to kotlin. Used to parse, construct, normalize, and encode URLS. We use it to hit our weather api.
             response = URL("https://api.openweathermap.org/data/2.5/weather?q=$CITY&units=imperial&appid=$API").readText(
                 Charsets.UTF_8
             )
@@ -46,7 +55,10 @@ class MainActivity : AppCompatActivity() {
         return response
     }
 
-
+        //This is the function provided by the Android API
+        //Invoked after doInBackground is finished
+        //Results of the doInBackground are passed to this function
+        //Bellow we set are UI to the results of the weather API
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             try {
@@ -93,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById<ProgressBar>(R.id.loader).visibility = View.GONE
                 findViewById<TextView>(R.id.errortext).visibility = View.VISIBLE
                 findViewById<TextView>(R.id.errortext).text = e.toString()
+                //Set the error to the error response
             }
 
         }
